@@ -1,0 +1,38 @@
+{
+  "name": "bigtime-mcp-server",
+  "version": "0.0.1",
+  "description": "MCP server for BigTime time tracking and project management API integration",
+  "author": "Samin Amanat",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amanat361/bigtime-mcp-server.git"
+  },
+  "keywords": ["mcp", "bigtime", "time-tracking", "project-management", "claude", "mcp-server"],
+  "homepage": "https://github.com/amanat361/bigtime-mcp-server#readme",
+  "bugs": {
+    "url": "https://github.com/amanat361/bigtime-mcp-server/issues"
+  },
+  "type": "module",
+  "bin": {
+    "bigtime-mcp-server": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc && mcp-build",
+    "watch": "tsc --watch",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "mcp-framework": "^0.2.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.24",
+    "typescript": "^5.3.3"
+  },
+  "engines": {
+    "node": ">=18.19.0"
+  }
+}
