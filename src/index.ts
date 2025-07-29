@@ -14,7 +14,7 @@ import "./tools/GetDailyTotalsTool.js";
 
 const server = new MCPServer({
   name: "bigtime-mcp-server",
-  version: "0.2.4",
+  version: "0.2.5",
   basePath: join(process.cwd(), "dist"),
   transport: {
     type: "http-stream",

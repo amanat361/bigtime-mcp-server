@@ -1,6 +1,6 @@
 {
   "name": "bigtime-mcp-server",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "MCP server for BigTime time tracking and project management API integration",
   "author": "Samin Amanat",
   "license": "MIT",
