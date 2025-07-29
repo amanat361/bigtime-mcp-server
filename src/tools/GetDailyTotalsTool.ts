@@ -2,32 +2,18 @@ import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 import { BigTimeClient, getBigTimeCredentials, BigTimeCredentialsError } from "../bigtime/index.js";
 
-interface GetDailyTotalsInput {
-  staffId: number;
-  startDate: string;
-  endDate: string;
-}
+const GetDailyTotalsSchema = z.object({
+  staffId: z.number().describe("The StaffSid of the staff member to get daily totals for"),
+  startDate: z.string().describe("Start date in YYYY-MM-DD format"),
+  endDate: z.string().describe("End date in YYYY-MM-DD format"),
+});
 
-class GetDailyTotalsTool extends MCPTool<GetDailyTotalsInput> {
+class GetDailyTotalsTool extends MCPTool {
   name = "get-daily-totals";
   description = "Get daily time totals for a staff member from BigTime API";
+  schema = GetDailyTotalsSchema;
 
-  schema = {
-    staffId: {
-      type: z.number(),
-      description: "The StaffSid of the staff member to get daily totals for",
-    },
-    startDate: {
-      type: z.string(),
-      description: "Start date in YYYY-MM-DD format",
-    },
-    endDate: {
-      type: z.string(),
-      description: "End date in YYYY-MM-DD format",
-    },
-  };
-
-  async execute(input: GetDailyTotalsInput) {
+  async execute(input: z.infer<typeof GetDailyTotalsSchema>) {
     try {
       // Validate date format (basic validation)
       const dateRegex = /^\d{4}-\d{2}-\d{2}$/;

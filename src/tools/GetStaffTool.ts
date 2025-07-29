@@ -2,32 +2,18 @@ import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 import { BigTimeClient, getBigTimeCredentials, BigTimeCredentialsError } from "../bigtime/index.js";
 
-interface GetStaffInput {
-  showInactive?: boolean;
-  limit?: number;
-  offset?: number;
-}
+const GetStaffSchema = z.object({
+  showInactive: z.boolean().optional().describe("Whether to include inactive staff members (default: false)"),
+  limit: z.number().optional().describe("Maximum number of staff members to return (default: 50, max: 1000)"),
+  offset: z.number().optional().describe("Number of staff members to skip for pagination (default: 0)"),
+});
 
-class GetStaffTool extends MCPTool<GetStaffInput> {
+class GetStaffTool extends MCPTool {
   name = "get-staff";
   description = "Get staff members from BigTime API";
+  schema = GetStaffSchema;
 
-  schema = {
-    showInactive: {
-      type: z.boolean().optional(),
-      description: "Whether to include inactive staff members (default: false)",
-    },
-    limit: {
-      type: z.number().optional(),
-      description: "Maximum number of staff members to return (default: 50, max: 1000)",
-    },
-    offset: {
-      type: z.number().optional(),
-      description: "Number of staff members to skip for pagination (default: 0)",
-    },
-  };
-
-  async execute(input: GetStaffInput) {
+  async execute(input: z.infer<typeof GetStaffSchema>) {
     try {
       // Validate pagination parameters
       const limit = Math.min(input.limit || 50, 1000);

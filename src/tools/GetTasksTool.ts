@@ -2,42 +2,20 @@ import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 import { BigTimeClient, getBigTimeCredentials, BigTimeCredentialsError } from "../bigtime/index.js";
 
-interface GetTasksInput {
-  projectId?: number;
-  staffId?: number;
-  showCompleted?: boolean;
-  limit?: number;
-  offset?: number;
-}
+const GetTasksSchema = z.object({
+  projectId: z.number().optional().describe("The SystemId of the project to get tasks for"),
+  staffId: z.number().optional().describe("The StaffSid of the staff member to get tasks for"),
+  showCompleted: z.boolean().optional().describe("Whether to include completed tasks (default: false)"),
+  limit: z.number().optional().describe("Maximum number of tasks to return (default: 50, max: 1000)"),
+  offset: z.number().optional().describe("Number of tasks to skip for pagination (default: 0)"),
+});
 
-class GetTasksTool extends MCPTool<GetTasksInput> {
+class GetTasksTool extends MCPTool {
   name = "get-tasks";
   description = "Get tasks from BigTime API by project or staff member";
+  schema = GetTasksSchema;
 
-  schema = {
-    projectId: {
-      type: z.number().optional(),
-      description: "The SystemId of the project to get tasks for",
-    },
-    staffId: {
-      type: z.number().optional(),
-      description: "The StaffSid of the staff member to get tasks for",
-    },
-    showCompleted: {
-      type: z.boolean().optional(),
-      description: "Whether to include completed tasks (default: false)",
-    },
-    limit: {
-      type: z.number().optional(),
-      description: "Maximum number of tasks to return (default: 50, max: 1000)",
-    },
-    offset: {
-      type: z.number().optional(),
-      description: "Number of tasks to skip for pagination (default: 0)",
-    },
-  };
-
-  async execute(input: GetTasksInput) {
+  async execute(input: z.infer<typeof GetTasksSchema>) {
     try {
       // Validate input - need either projectId or staffId
       if (!input.projectId && !input.staffId) {

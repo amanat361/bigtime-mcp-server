@@ -2,52 +2,22 @@ import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 import { BigTimeClient, getBigTimeCredentials, BigTimeCredentialsError } from "../bigtime/index.js";
 
-interface GetTimeEntriesInput {
-  staffId?: number;
-  projectId?: number;
-  startDate: string;
-  endDate: string;
-  view?: "Basic" | "Detailed";
-  limit?: number;
-  offset?: number;
-}
+const GetTimeEntriesSchema = z.object({
+  staffId: z.number().optional().describe("The StaffSid of the staff member to get time entries for"),
+  projectId: z.number().optional().describe("The ProjectSid of the project to get time entries for"),
+  startDate: z.string().describe("Start date in YYYY-MM-DD format"),
+  endDate: z.string().describe("End date in YYYY-MM-DD format"),
+  view: z.enum(["Basic", "Detailed"]).optional().describe("The view type (Basic or Detailed, default: Detailed)"),
+  limit: z.number().optional().describe("Maximum number of time entries to return (default: 50, max: 1000)"),
+  offset: z.number().optional().describe("Number of time entries to skip for pagination (default: 0)"),
+});
 
-class GetTimeEntresTool extends MCPTool<GetTimeEntriesInput> {
+class GetTimeEntresTool extends MCPTool {
   name = "get-time-entries";
   description = "Get time entries from BigTime API for a staff member or project within a date range";
+  schema = GetTimeEntriesSchema;
 
-  schema = {
-    staffId: {
-      type: z.number().optional(),
-      description: "The StaffSid of the staff member to get time entries for",
-    },
-    projectId: {
-      type: z.number().optional(),
-      description: "The ProjectSid of the project to get time entries for",
-    },
-    startDate: {
-      type: z.string(),
-      description: "Start date in YYYY-MM-DD format",
-    },
-    endDate: {
-      type: z.string(),
-      description: "End date in YYYY-MM-DD format",
-    },
-    view: {
-      type: z.enum(["Basic", "Detailed"]).optional(),
-      description: "The view type (Basic or Detailed, default: Detailed)",
-    },
-    limit: {
-      type: z.number().optional(),
-      description: "Maximum number of time entries to return (default: 50, max: 1000)",
-    },
-    offset: {
-      type: z.number().optional(),
-      description: "Number of time entries to skip for pagination (default: 0)",
-    },
-  };
-
-  async execute(input: GetTimeEntriesInput) {
+  async execute(input: z.infer<typeof GetTimeEntriesSchema>) {
     try {
       // Validate input - need either staffId or projectId
       if (!input.staffId && !input.projectId) {

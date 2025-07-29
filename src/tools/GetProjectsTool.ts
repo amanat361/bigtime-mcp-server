@@ -2,32 +2,18 @@ import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 import { BigTimeClient, getBigTimeCredentials, BigTimeCredentialsError } from "../bigtime/index.js";
 
-interface GetProjectsInput {
-  showInactive?: boolean;
-  limit?: number;
-  offset?: number;
-}
+const GetProjectsSchema = z.object({
+  showInactive: z.boolean().optional().describe("Whether to include inactive projects (default: false)"),
+  limit: z.number().optional().describe("Maximum number of projects to return (default: 50, max: 1000)"),
+  offset: z.number().optional().describe("Number of projects to skip for pagination (default: 0)"),
+});
 
-class GetProjectsTool extends MCPTool<GetProjectsInput> {
+class GetProjectsTool extends MCPTool {
   name = "get-projects";
   description = "Get projects from BigTime API";
+  schema = GetProjectsSchema;
 
-  schema = {
-    showInactive: {
-      type: z.boolean().optional(),
-      description: "Whether to include inactive projects (default: false)",
-    },
-    limit: {
-      type: z.number().optional(),
-      description: "Maximum number of projects to return (default: 50, max: 1000)",
-    },
-    offset: {
-      type: z.number().optional(),
-      description: "Number of projects to skip for pagination (default: 0)",
-    },
-  };
-
-  async execute(input: GetProjectsInput) {
+  async execute(input: z.infer<typeof GetProjectsSchema>) {
     try {
       // Validate pagination parameters
       const limit = Math.min(input.limit || 50, 1000);

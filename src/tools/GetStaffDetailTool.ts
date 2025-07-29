@@ -2,27 +2,17 @@ import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 import { BigTimeClient, getBigTimeCredentials, BigTimeCredentialsError } from "../bigtime/index.js";
 
-interface GetStaffDetailInput {
-  staffId: number;
-  view?: "Basic" | "Detailed";
-}
+const GetStaffDetailSchema = z.object({
+  staffId: z.number().describe("The StaffSid of the staff member to get details for"),
+  view: z.enum(["Basic", "Detailed"]).optional().describe("The view type (Basic or Detailed, default: Detailed)"),
+});
 
-class GetStaffDetailTool extends MCPTool<GetStaffDetailInput> {
+class GetStaffDetailTool extends MCPTool {
   name = "get-staff-detail";
   description = "Get detailed information about a specific staff member from BigTime API";
+  schema = GetStaffDetailSchema;
 
-  schema = {
-    staffId: {
-      type: z.number(),
-      description: "The StaffSid of the staff member to get details for",
-    },
-    view: {
-      type: z.enum(["Basic", "Detailed"]).optional(),
-      description: "The view type (Basic or Detailed, default: Detailed)",
-    },
-  };
-
-  async execute(input: GetStaffDetailInput) {
+  async execute(input: z.infer<typeof GetStaffDetailSchema>) {
     try {
       // Get credentials from environment
       const credentials = getBigTimeCredentials();

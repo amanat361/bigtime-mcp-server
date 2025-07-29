@@ -2,32 +2,18 @@ import { MCPTool } from "mcp-framework";
 import { z } from "zod";
 import { BigTimeClient, getBigTimeCredentials, BigTimeCredentialsError } from "../bigtime/index.js";
 
-interface GetClientsInput {
-  showInactive?: boolean;
-  limit?: number;
-  offset?: number;
-}
+const GetClientsSchema = z.object({
+  showInactive: z.boolean().optional().describe("Whether to include inactive clients (default: false)"),
+  limit: z.number().optional().describe("Maximum number of clients to return (default: 50, max: 1000)"),
+  offset: z.number().optional().describe("Number of clients to skip for pagination (default: 0)"),
+});
 
-class GetClientsTool extends MCPTool<GetClientsInput> {
+class GetClientsTool extends MCPTool {
   name = "get-clients";
   description = "Get clients from BigTime API";
+  schema = GetClientsSchema;
 
-  schema = {
-    showInactive: {
-      type: z.boolean().optional(),
-      description: "Whether to include inactive clients (default: false)",
-    },
-    limit: {
-      type: z.number().optional(),
-      description: "Maximum number of clients to return (default: 50, max: 1000)",
-    },
-    offset: {
-      type: z.number().optional(),
-      description: "Number of clients to skip for pagination (default: 0)",
-    },
-  };
-
-  async execute(input: GetClientsInput) {
+  async execute(input: z.infer<typeof GetClientsSchema>) {
     try {
       // Validate pagination parameters
       const limit = Math.min(input.limit || 50, 1000);
